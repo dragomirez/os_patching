@@ -1,0 +1,8 @@
+---
+# Check via loop 
+
+- name: Cycle all volumes to be update
+  fail:
+    msg: "The device ({{ vg00_monts.device }}) is not empty"
+  when: vg00_monts.device != 0
+  loop: "{{ echo.vg00_monts }}"

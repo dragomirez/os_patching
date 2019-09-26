@@ -1,0 +1,66 @@
+---
+
+- name: Deny direct root access via ssh
+
+  hosts: all
+  gather_facts: no
+  become: yes
+  vars:
+
+  tasks:
+      - name:  << {{ inventory_hostname_short }} >>  check if file /etc/ssh/sshd_config exists
+        stat: path=/etc/ssh/sshd_config
+        register: sshd_conf
+
+### remove any PermitRootLogin yes to remove explicit alow of direct root access 
+      - name:  << {{ inventory_hostname_short }} >> Remove PermitRootLogin yes
+        lineinfile:
+           path: /etc/ssh/sshd_config
+           state: absent
+           regexp: '^[ \t]*PermitRootLogin[ \t]*yes'
+           backup: true
+        when: sshd_conf.stat.exists == true
+
+### Add  PermitRootLogin no to deny direct root login
+      - name:  << {{ inventory_hostname_short }} >> Ensure PermitRootLogin no
+        lineinfile:
+           path: /etc/ssh/sshd_config
+           state: present
+           regexp: '^[ \t]*PermitRootLogin[ \t]*no'
+           line: 'PermitRootLogin no'
+           backup: true
+        when: sshd_conf.stat.exists == true
+
+### remove any IgnoreRhosts  no to remove explicit alow Truested host connections
+      - name:  << {{ inventory_hostname_short }} >> Remove IgnoreRhosts  no
+        lineinfile:
+           path: /etc/ssh/sshd_config
+           state: absent
+           backup: true
+           regexp: '^[ \t]*IgnoreRhosts[ \t]*no'
+        when: sshd_conf.stat.exists == true
+
+### Add  IgnoreRhosts yes to deny  Truested host connections
+      - name:  << {{ inventory_hostname_short }} >> Ensure IgnoreRhosts yes
+        lineinfile:
+           path: /etc/ssh/sshd_config
+           state: present
+           regexp: '^[ \t]*IgnoreRhosts[ \t]*yes'
+           line: 'IgnoreRhosts yes'
+           backup: true
+        when: sshd_conf.stat.exists == true
+
+###  restart sshd service to applay settings
+      - name:  << {{ inventory_hostname_short }} >> Restart SSHD service
+        service:
+          name: sshd.service
+          state: restarted
+        when: sshd_conf.stat.exists == true
+
+###  cehck if sshd started running
+      - name:  << {{ inventory_hostname_short }} >> ensure that start SSHD service
+        service:
+          name: sshd.service
+          state: started
+        when: sshd_conf.stat.exists == true
+

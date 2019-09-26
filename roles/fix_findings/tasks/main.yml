@@ -1,0 +1,88 @@
+---
+
+- name: Fix security high prio findings 
+
+  hosts: all
+  gather_facts: no
+  become: yes
+  vars:
+
+  tasks:
+
+      - name:  << {{ inventory_hostname_short }} >> - copy check_security_permissions_password.sh  /tmp/check_security_permissions_password.sh
+        copy:
+          src: /home/ansautomat/pivarci/playbook/security/check_security_permissions_password.sh
+          dest: /tmp/check_security_permissions_password.sh
+          owner: root
+          group: root
+          mode: 0700
+
+      - name:  << {{ inventory_hostname_short }} >> - copy fix_security_permissions_password.sh  /tmp/fix_security_permissions_password.sh
+        copy:
+          src: /home/ansautomat/pivarci/playbook/security/fix_security_permissions_password.sh
+          dest: /tmp/fix_security_permissions_password.sh
+          owner: root
+          group: root
+          mode: 0700
+
+      - name: << {{ inventory_hostname_short }} >> - Check if /tmp/check_security_permissions_password.sh file exist
+        stat: path=/tmp/check_security_permissions_password.sh
+        register: check_prg_1
+
+      - name: << {{ inventory_hostname_short }} >> - Add executable privilege on /tmp/check_security_permissions_password.sh
+        file:
+          path: /tmp/check_security_permissions_password.sh
+          mode: "0700"
+        when: check_prg_1.stat.exists == true
+
+      - name: << {{ inventory_hostname_short }} >> - Check if /tmp/fix_security_permissions_password.sh file exist
+        stat: path=/tmp/fix_security_permissions_password.sh
+        register: fix_prg_1
+
+      - name: << {{ inventory_hostname_short }} >> - Add executable privilege on /tmp/fix_security_permissions_password.sh
+        file:
+          path: /tmp/fix_security_permissions_password.sh
+          mode: "0700"
+        when: fix_prg_1.stat.exists == true
+
+      - name: << {{ inventory_hostname_short }} >> - Run /tmp/check_security_permissions_password.sh to check issues
+        command: /tmp/check_security_permissions_password.sh
+        ignore_errors: yes
+        register: output
+        when: check_prg_1.stat.exists == true
+
+      - debug: var=output.stdout_lines
+        when: check_prg_1.stat.exists == true
+
+      - name: << {{ inventory_hostname_short }} >> - Run /tmp/fix_security_permissions_password.sh to fix issues
+        command: /tmp/fix_security_permissions_password.sh
+        ignore_errors: yes
+        register: output_fix
+        when: fix_prg_1.stat.exists == true
+
+      - debug: var=output_fix.stdout_lines
+        when: fix_prg_1.stat.exists == true
+
+      - name: << {{ inventory_hostname_short }} >> - Run post check /tmp/check_security_permissions_password.sh to check issues
+        command: /tmp/check_security_permissions_password.sh
+        ignore_errors: yes
+        register: output_post
+        when: fix_prg_1.stat.exists == true
+
+      - debug: var=output_post.stdout_lines
+        when: fix_prg_1.stat.exists == true
+
+
+      - name: << {{ inventory_hostname_short }} >> - Remove /tmp/check_security_permissions_password.sh
+        file:
+          state: absent
+          path: "/tmp/check_security_permissions_password.sh"
+        when: check_prg_1.stat.exists == true
+
+      - name: << {{ inventory_hostname_short }} >> - Remove /tmp/fix_security_permissions_password.sh
+        file:
+          state: absent
+          path: "/tmp/fix_security_permissions_password.sh"
+        when: fix_prg_1.stat.exists == true
+
+

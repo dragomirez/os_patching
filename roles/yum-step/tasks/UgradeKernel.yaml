@@ -1,0 +1,16 @@
+- name: yum upgrade kernel*
+  shell: yum -y upgrade kernel
+
+- name: Get latest installed kerner
+  shell: rpm -qa | grep kernel-3 | sort | head -1 | awk -F'kernel' '{print $2}'
+  register: result
+
+- name: Get menu entry 
+  shell: more /boot/efi/EFI/redhat/grub.cfg | grep -e '{{result.stdout}}' | grep linuxefi
+  register: menuresult
+  failed_when: menuresult is not defined or menuresult.stdout  is not defined or menuresult.stdout==""
+
+- name: Get for initramfs
+  shell: more /boot/efi/EFI/redhat/grub.cfg | grep -e '{{result.stdout}}' | grep initrdefi
+  register: ramfsresult
+  failed_when: ramfsresult is not defined or ramfsresult.stdout  is not defined or ramfsresult.stdout==""

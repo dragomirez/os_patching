@@ -1,0 +1,6 @@
+- name: Check and fix security high prio findings and deny ssh root access
+  hosts: all
+  roles:
+    - check_findings
+    - fix_findings
+    - deny_root

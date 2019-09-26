@@ -1,0 +1,4 @@
+- name: Install base packages
+  shell:  yum -y install wget git net-tools bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct docker-1.13.1 python-ipaddress
+- name: yum upgrade --exclude=kernel*
+  shell: yum -y upgrade --setopt=protected_multilib=false --exclude=kernel*

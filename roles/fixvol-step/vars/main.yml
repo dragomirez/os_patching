@@ -1,0 +1,34 @@
+---
+# vars file for fixvol-step
+# └─sda4                   8:4    0 16.1G  0 part
+#   ├─vg00-rootvol       253:0    0    5G  0 lvm  /
+#   ├─vg00-swapvol       253:1    0    2G  0 lvm  [SWAP]
+#   ├─vg00-homevol       253:6    0    2G  0 lvm  /home
+#   ├─vg00-tmpvol        253:7    0    1G  0 lvm  /tmp
+#   ├─vg00-auditvol      253:8    0  256M  0 lvm  /var/log/audit
+#   ├─vg00-crashvol      253:9    0    1G  0 lvm  /var/crash
+#   └─vg00-varvol        253:10   0   20G  0 lvm  /var
+
+
+vg00_monts: [
+  {
+    "device": "/dev/mapper/vg00-rootvol",
+    "mount": "/",
+    "size_total": 5358223360
+  },
+  {
+    "device": "/dev/mapper/vg00-homevol",
+    "mount": "/home",
+    "size_total": 2140405760
+  },
+  {
+    "device": "/dev/mapper/vg00-auditvol",
+    "mount": "/var/log/audit",
+    "size_total": 261357568
+  },
+  {
+    "device": "",
+    "mount": "",
+    "size_total": 0
+  }
+]

@@ -1,0 +1,11 @@
+# tasks file for yum-step
+# multi step upgrade
+
+- name: Fix yum transactions
+  shell: /usr/sbin/yum-complete-transaction --cleanup-only
+
+- name: Update Packages
+  include_tasks: UpgradeXceptKernel.yml
+
+- name: Update Kernel
+  include_tasks: UpgradeKernel.yml
