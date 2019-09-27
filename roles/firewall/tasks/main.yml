@@ -1,0 +1,27 @@
+---
+- name: Fiewall rules
+  hosts: nodes
+  become: true
+  gather_facts: no
+  serial: 1
+  tasks:
+    - name: write firewall rules
+      shell: |
+        firewall-cmd --zone=public --permanent --add-port=5599-5600/tcp
+#        firewall-cmd --zone=public --permanent --add-port=7220-7222/tcp
+#        firewall-cmd --zone=public --permanent --add-port=7443/tcp
+#        firewall-cmd --zone=public --permanent --add-port=8243/tcp
+    - name: Restart firewalld
+      service:
+        name: firewalld
+        state: restarted
+#    - name: Restart docker
+#     service:
+#       name: docker
+#       state: restarted
+#   - name: Restart atomic-openshift-node
+#     service:
+#       name: atomic-openshift-node
+#       state: restarted
+#
+
